@@ -1,15 +1,17 @@
-BeginPackage["WeylMultiwaySystem`"]
+Package["WeylMultiwaySystem`"]
 
-(* PackageImport["importpackages"] *) 
+PackageImport["GeneralUtilities`"]
 
 PackageExport["WeylMultiwayFinite"]
 
-SetUsage @ "
-WeylMultiwayFinite[FiniteAlgebra, r, n, Options] gives the Multiway System of a
+(* Usuage Documentation *)
+
+SetUsage @ "WeylMultiwayFinite[FiniteAlgebra, r, n, Options] gives the Multiway System of a
 Finite Algebra {An,Bn,Cn,Dn,E6,E7,E8,F4,G2} of rank, r, after n iterations, with Options
 matching those of MultiwayFunctionSystem.   
 ";
 
+(*)
 A::"usage"="represents the simple root systems of series A, for r>0";
 B::"usage"="represents the simple root systems of series B, for r>2";
 C::"usage"="represents the simple root systems of series C, for r>2";
@@ -17,7 +19,9 @@ D::"usage"="represents the simple root systems of series D, for r>3";
 E::"usage"="represents the simple root systems of series E, for r=6,7,8";
 F::"usage"="represents the simple root systems of series F, for r=4";
 G::"usage"="represents the simple root systems of series G, for r=2";
- 
+ *)
+
+(* Functions and their implementation *)
 
 (*)
 SyntaxInformation[WeylMultiwayFinite] = {"ArgumentsPattern" -> {_}};
@@ -83,6 +87,4 @@ group as defined above  *)
   ResourceFunction["MultiwayFunctionSystem"][
    Function[reflectedRoot, 
     root @@ W[List @@ #, List @@ reflectedRoot] & /@ simpleRoots], 
-   simpleRoots, n, options]]
-
-EndPackage[];
+   simpleRoots, n, options]];
