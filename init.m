@@ -4,7 +4,7 @@ ClearAll @@ (# <> "*" & /@ Contexts["WeylMultiwaySystem`*"]);
 
 BeginPackage["WeylMultiwaySystem`"];
 
-(* Unsure what else I need in here *) 
+(* Unfinished! *) 
 
 EndPackage[];
 
