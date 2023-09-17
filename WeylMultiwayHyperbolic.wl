@@ -22,11 +22,20 @@ SyntaxInformation[WeylMultiwayFinite] = {"ArgumentsPattern" -> {_}};
  (* Inner product finite *) 
 InnerProductFinite[x_, y_] := Total[x y];
  
-   (* Inner product 
+   (* Inner product - Different for A and others are the same due to their dimension of representation due to Bourbaki
 P[x_,y_]:= \!\(
 \*UnderoverscriptBox[\(\[Sum]\), \(i = 1\), \(r + 1\)]\(x[\([i]\)]y[\([i]\)]\)\)-\!\(
 \*UnderoverscriptBox[\(\[Sum]\), \(i = 1\), \(n\)]\((x[\([r + 1 + 2 i - 1]\)]y[\([r + 1 + 2 i\ ]\)] + y[\([r + 1 + 2 i\  - \ 1]\)]x[\([r + 1 + 2 i]\)])\)\);*) 
-InnerProduct[x_,y_,r_,n_]:= Sum[x[[i]]y[[i]],{i,1,r+1}]- Sum[x[[r+1+2i-1]]y[[r+1+2i]]+y[[r+1+2i-1]]x[[r+1+2i]],{i,n}]
+InnerProduct["A",x_,y_,r_,n_]:= Sum[x[[i]]y[[i]],{i,1,r+1}]- Sum[x[[r+1+2i-1]]y[[r+1+2i]]+y[[r+1+2i-1]]x[[r+1+2i]],{i,n}];
+InnerProduct["B",x_,y_,r_,n_]:= Sum[x[[i]]y[[i]],{i,1,r}]- Sum[x[[r+2i-1]]y[[r+2i]]+y[[r+2i-1]]x[[r+2i]],{i,n}];
+InnerProduct["C",x_,y_,r_,n_]:= Sum[x[[i]]y[[i]],{i,1,r}]- Sum[x[[r+2i-1]]y[[r+2i]]+y[[r+2i-1]]x[[r+2i]],{i,n}];
+InnerProduct["D",x_,y_,r_,n_]:= Sum[x[[i]]y[[i]],{i,1,r}]- Sum[x[[r+2i-1]]y[[r+2i]]+y[[r+2i-1]]x[[r+2i]],{i,n}];
+InnerProduct["D",x_,y_,r_,n_]:= Sum[x[[i]]y[[i]],{i,1,r}]- Sum[x[[r+2i-1]]y[[r+2i]]+y[[r+2i-1]]x[[r+2i]],{i,n}];
+InnerProduct["E",x_,y_,r_,n_]:= Sum[x[[i]]y[[i]],{i,1,r}]- Sum[x[[r+2i-1]]y[[r+2i]]+y[[r+2i-1]]x[[r+2i]],{i,n}];
+InnerProduct["F",x_,y_,r_,n_]:= Sum[x[[i]]y[[i]],{i,1,r}]- Sum[x[[r+2i-1]]y[[r+2i]]+y[[r+2i-1]]x[[r+2i]],{i,n}];
+InnerProduct["G",x_,y_,r_,n_]:= Sum[x[[i]]y[[i]],{i,1,r}]- Sum[x[[r+2i-1]]y[[r+2i]]+y[[r+2i-1]]x[[r+2i]],{i,n}];
+
+
 (* Defining functions to give all the semi-simple algebra's simple roots as private functions *) 
 
 RootsAFinite[r_,n_] := 
@@ -47,29 +56,58 @@ RootsAExtendedParts[r_,n_] := Join[{-(ExtendedPartK[r,n][[1]] + ExtendedPartKBar
 SimpleRootsHyperbolic["A", r_,n_] := 
  Join[RootsAFinite[r,n], RootsAAffineRoot[r,n],RootsAExtendedParts[r,n]];
 
-CartanA["A",r_,n_]:= Table[InnerProduct[SimpleRootsHyperbolic["A", r,n][[i]],SimpleRootsHyperbolic["A", r,n][[j]]  ,r,n],{i,1,r+n+1},{j,1,r+n+1}]//MatrixForm;
+Cartan[alg_,r_,n_]:= Table[InnerProduct[alg,SimpleRootsHyperbolic[alg, r,n][[i]],SimpleRootsHyperbolic[alg, r,n][[j]]  ,r,n],{i,1,r+n+1},{j,1,r+n+1}]//MatrixForm;
 
 
-RootsB[r_] := 
+(* n-extended simple root systems *)
+
+(* A Series is given in detail above *)
+
+(* General n-extended parts of the root structure - in r+2n diemensions - for all except the representation of the A series *)
+RootsExtendedParts[r_,n_] := Join[{-(ExtendedPartK[r-1,n][[1]] + ExtendedPartKBar[r-1,n][[1]])},Table[ExtendedPartK[r-1,n][[j-1]] - (ExtendedPartK[r-1,n][[j]] + ExtendedPartKBar[r-1,n][[j]]) ,{j,2,n}]];
+ 
+(* B *)
+RootsBFinite[r_,n_] := 
   Join[Table[
-    UnitVector[r , i] - UnitVector[r , i + 1], {i, 1, 
-     r - 1}], {UnitVector[r, r]}];(* Simple roots *) 
-SimpleRootsAffine["B", r_] := 
-  Join[RootsB[r], -{UnitVector[r, 1] + UnitVector[r, 2]}];
+    UnitVector[r +2n , i] - UnitVector[r + 2n , i + 1], {i, 1, 
+     r - 1}], {UnitVector[r+2n, r]}];(* Simple roots *)
+     
+RootsBAffineRoot[r_,n_]:={-Sum[RootsBFinite[r,n][[i]], {i, 1, r}]+ExtendedPartK[r-1,n][[1]]};
 
-RootsC[r_] := 
+SimpleRootsHyperbolic["B", r_,n_] := 
+ Join[RootsBFinite[r,n], RootsBAffineRoot[r,n],RootsExtendedParts[r,n]];
+ 
+ 
+(* C *)
+RootsCFinite[r_,n_] := 
   Join[Table[
-    UnitVector[r , i] - UnitVector[r , i + 1], {i, 1, 
-     r - 1}], {2 UnitVector[r, r]}]; (* Simple roots *) 
-SimpleRootsAffine["C", r_] := Join[RootsC[r], -2 {UnitVector[r, 1]}];
+    UnitVector[r+2n , i] - UnitVector[r+2n , i + 1], {i, 1, 
+     r - 1}], {2 UnitVector[r+2n, r]}]; (* Simple roots *) 
+     
+RootsCAffineRoot[r_,n_]:={-Sum[RootsCFinite[r,n][[i]], {i, 1, r}]+ExtendedPartK[r-1,n][[1]]}
+SimpleRootsHyperbolic["C", r_,n_] := 
+ Join[RootsCFinite[r,n], RootsCAffineRoot[r,n],RootsExtendedParts[r,n]];
+ 
 
-SimpleRootsAffine["D", r_] := 
+(* D *)
+SimpleRootsAffine["D", r_,n_] := 
   Join[Table[
-    UnitVector[r , i] - UnitVector[r , i + 1], {i, 1, 
-     r - 1}], {UnitVector[r, r - 1] + UnitVector[r, r]}];
+    UnitVector[r+2n, i] - UnitVector[r+2n , i + 1], {i, 1, 
+     r+2n - 1}], {UnitVector[r+2n, r - 1] + UnitVector[r+2n, r]+ExtendedPartK[r-1,n][[1]]}];
 
+(* Extend directly from the affine set, more direct than the way done for A,B and C above*)
+SimpleRootsHyperbolic["D", r_,n_] := 
+ Join[SimpleRootsAffine["D",r,n],RootsExtendedParts[r,n]];
+ 
+ 
+ 
+ (* TODO: NEXT: Work out how to pad/ get the E-series arrays in the correct positions for the n-extensions -->> Probably best to look in the code
+ / notes for my old work because will have certainly done this somewhere else before... -->> Look where I have generated the 
+ n-exteneded roots for the E-series and do this here below! *)  
+       
+(* E Series' *)
 SimpleRootsAffine["E", 
-   6] := {2 {1/
+   6,n_] := ArrayPad[{2 {1/
      2, -(1/2), -(1/2), -(1/2), \[Minus](1/2), \[Minus](1/
       2), \[Minus](1/2), 1/2},
    2 {1, 1, 0, 0, 0, 0, 0, 0},
@@ -77,7 +115,7 @@ SimpleRootsAffine["E",
    2 {0, -1, 1, 0, 0, 0, 0, 0},
    2 {0, 0, -1, 1, 0, 0, 0, 0},
    2 {0, 0, 0, -1, 1, 0, 0, 0},
-   2 {-(1/2), -(1/2), -(1/2), -(1/2), -(1/2), 1/2, 1/2, -(1/2)}};
+   2 {-(1/2), -(1/2), -(1/2), -(1/2), -(1/2), 1/2, 1/2, -(1/2)}},{0,2n}]+ExtendedPartK[8,n][[1]];
 
 SimpleRootsAffine["E", 
    7] :=  {2 {1/
@@ -101,7 +139,12 @@ SimpleRootsAffine["E",
    {0, 0, 0, 0, -2, 2, 0, 0},
    {0, 0, 0, 0, 0, -2, 2, 0},
    {0, 0, 0, 0, 0, 0, -2, -2}};
-
+   
+(* General hyperbolic roots for the E series' *)
+SimpleRootsHyperbolic["E", r_,n_] := 
+ Join[SimpleRootsAffine["E",r,n],RootsExtendedParts[r,n]];
+ 
+(* F *) 
 SimpleRootsAffine["F", 4] := {2 {0, 1, -1, 0}, 2 {0, 0, 1, -1}, 
    2 {0, 0, 0, 1}, 2 {1/2, -(1/2), -(1/2), -(1/2)}, 2 {-1, -1, 0, 0}};
 
@@ -143,9 +186,8 @@ HyperbolicWeylReflectionsGraph[Alg_,r_,m_,n_,options___]:=With[{simpleRoots = ro
 
 
 (* Reflections in a hyperplane orthogonal to the roots - for a rank, r algebra *)
+HyperbolicW[alg_,ai_,j_,r_,n_,m_] := j - 2(InnerProduct[alg,ai,j,r,n]/InnerProduct[alg,ai,ai,r,n])ai+2(m/InnerProduct[alg,ai,ai,r,n])ai;
 
-HyperbolicW[ai_,j_,r_,n_,m_] := j - 2(InnerProduct[ai,j,r,n]/InnerProduct[ai,ai,r,n])ai+2(m/InnerProduct[ai,ai,r,n])ai;
+WeylMultiwayHyperbolic[Alg_,r_,n_,m_,iterations_,options___]:=With[{simpleRoots = root@@@SimpleRootsHyperbolic[Alg,r,n]},ResourceFunction["MultiwayFunctionSystem"][Function[reflectedRoot,root@@HyperbolicW[Alg,List@@#,List@@reflectedRoot,r,n,m]&/@simpleRoots],simpleRoots,iterations, options]];
 
-WeylMultiwayHyperbolic[Alg_,r_,n_,m_,iterations_,options___]:=With[{simpleRoots = root@@@SimpleRootsHyperbolic[Alg,r,n]},ResourceFunction["MultiwayFunctionSystem"][Function[reflectedRoot,root@@HyperbolicW[List@@#,List@@reflectedRoot,r,n,m]&/@simpleRoots],simpleRoots,iterations, options]];
-
-HyperbolicWeylReflectionsGraph[Alg_,r_,n_,m_,iterations_,options___]:=With[{simpleRoots = root@@@ SimpleRootsHyperbolic[Alg,r,n]},NestGraph[Function[reflectedRoot,root@@HyperbolicW[List@@#,List@@reflectedRoot,r,n,m]&/@simpleRoots],simpleRoots,iterations, options]];
+HyperbolicWeylReflectionsGraph[Alg_,r_,n_,m_,iterations_,options___]:=With[{simpleRoots = root@@@ SimpleRootsHyperbolic[Alg,r,n]},NestGraph[Function[reflectedRoot,root@@HyperbolicW[Alg,List@@#,List@@reflectedRoot,r,n,m]&/@simpleRoots],simpleRoots,iterations, options]];
