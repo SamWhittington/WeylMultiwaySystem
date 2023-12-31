@@ -35,6 +35,9 @@ InnerProduct["E",x_,y_,r_,n_]:= Sum[x[[i]]y[[i]],{i,1,r}]- Sum[x[[r+2i-1]]y[[r+2
 InnerProduct["F",x_,y_,r_,n_]:= Sum[x[[i]]y[[i]],{i,1,r}]- Sum[x[[r+2i-1]]y[[r+2i]]+y[[r+2i-1]]x[[r+2i]],{i,n}];
 InnerProduct["G",x_,y_,r_,n_]:= Sum[x[[i]]y[[i]],{i,1,r}]- Sum[x[[r+2i-1]]y[[r+2i]]+y[[r+2i-1]]x[[r+2i]],{i,n}];
 
+(* For the n-extended E series which has a finite basis of dimension 8*)
+InnerProduct["En",x_,y_,r_,n_]:= Sum[x[[i]]y[[i]],{i,1,8}]- Sum[x[[(r+2i-1)+(8-r)]]y[[r+2i+(8-r)]]+y[[(r+2i-1)+(8-r)]]x[[r+2i+(8-r)]],{i,n}];
+
 
 (* Defining functions to give all the semi-simple algebra's simple roots as private functions *) 
 
@@ -106,17 +109,25 @@ SimpleRootsHyperbolic["D", r_,n_] :=
  n-exteneded roots for the E-series and do this here below! *)  
        
 (* E Series' *)
-SimpleRootsAffine["E", 
-   6,n_] := ArrayPad[{2 {1/
-     2, -(1/2), -(1/2), -(1/2), \[Minus](1/2), \[Minus](1/
-      2), \[Minus](1/2), 1/2},
-   2 {1, 1, 0, 0, 0, 0, 0, 0},
-   2 {-1, 1, 0, 0, 0, 0, 0, 0},
-   2 {0, -1, 1, 0, 0, 0, 0, 0},
-   2 {0, 0, -1, 1, 0, 0, 0, 0},
-   2 {0, 0, 0, -1, 1, 0, 0, 0},
-   2 {-(1/2), -(1/2), -(1/2), -(1/2), -(1/2), 1/2, 1/2, -(1/2)}},{0,2n}]+ExtendedPartK[8,n][[1]];
+(* N.B. For the E-series its easiest to build from the finite basis and add the highest root as in our paper (not as in Bourbaki) *)
 
+SimpleRoots["E", 6] := {{1, -1, -1, -1, -1, -1, -1, 1},
+    {2, 2, 0, 0, 0, 0, 0, 0},
+    {-2, 2, 0, 0, 0, 0, 0, 0},
+    {0, -2, 2, 0, 0, 0, 0, 0},
+    {0, 0, -2, 2, 0, 0, 0, 0},
+    {0, 0, 0, -2, 2, 0, 0, 0}};
+    
+    
+SimpleRootsAffine["E", 
+   6,n_] := ArrayPad[{{0.5, -0.5, -0.5, -0.5, -0.5, -0.5, -0.5, 0.5,0,0},
+   {1, 1, 0, 0, 0, 0, 0, 0,0,0},
+    {-1, 1, 0, 0, 0, 0, 0, 0,0,0},
+    {0, -1, 1, 0, 0, 0, 0, 0,0,0},
+    {0, 0, -1, 1, 0, 0, 0, 0,0,0},
+    {0, 0, 0, -1, 1, 0, 0, 0,0,0},
+    {0, 0, 0, 0, -1, 1, 0, 0,1,0}},{{0,0},{0,(2n-2)}}];
+   
 SimpleRootsAffine["E", 
    7] :=  {2 {1/
      2, -(1/2), -(1/2), -(1/2), \[Minus](1/2), \[Minus](1/
@@ -129,6 +140,17 @@ SimpleRootsAffine["E",
    2 {0, 0, 0, 0, -1, 1, 0, 0},
    2 {0, 0, 0, 0, 0, 0, 1, -1}};
 
+(* Should work this way *)
+  SimpleRootsAffine["E", 8] :={{1/2,-(1/2),-(1/2),-(1/2),-(1/2),-(1/2),-(1/2),1/2,0,0},     (* Base rep for E9*)
+{1,1,0,0,0,0,0,0,0,0},
+{-1,1,0,0,0,0,0,0,0,0},
+{0,-1,1,0,0,0,0,0,0,0},
+{0,0,-1,1,0,0,0,0,0,0},
+{0,0,0,-1,1,0,0,0,0,0},
+{0,0,0,0,-1,1,0,0,0,0}, 
+{0,0,0,0,0,-1,1,0,0,0},
+{0,0,0,0,0,0,-1,-1,0,1}}; 
+(* (* Way that I don't think works... *)
 SimpleRootsAffine["E", 
    8] := {{1, -1, -1, -1, \[Minus]1, \[Minus]1, \[Minus]1, 1},
    {2, 2, 0, 0, 0, 0, 0, 0},
@@ -139,10 +161,15 @@ SimpleRootsAffine["E",
    {0, 0, 0, 0, -2, 2, 0, 0},
    {0, 0, 0, 0, 0, -2, 2, 0},
    {0, 0, 0, 0, 0, 0, -2, -2}};
+   *)
    
 (* General hyperbolic roots for the E series' *)
 SimpleRootsHyperbolic["E", r_,n_] := 
  Join[SimpleRootsAffine["E",r,n],RootsExtendedParts[r,n]];
+ 
+ (* Trying the above extension again now we have the correct affine system - 8-dimensional basis *)
+SimpleRootsHyperbolic["En", r_,n_] := 
+ Join[SimpleRootsAffine["E",r,n],RootsExtendedParts[8,n]];
  
 (* F *) 
 SimpleRootsAffine["F", 4] := {2 {0, 1, -1, 0}, 2 {0, 0, 1, -1}, 
